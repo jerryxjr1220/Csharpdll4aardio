@@ -61,7 +61,7 @@ if __name__=='__main__':
             citycontamination = re.findall(recitycontamination,cityhtml)[0]
         except:
             citycontamination = u'无首要污染物数据'
-        recitypm25 = re.compile('(?<=<span class="cbol_nongdu_num).+\d+?(?=</span>)')
+        recitypm25 = re.compile('<span class="cbol_nongdu_num_\d">(\d+)</span>')
         citypm25 = re.findall(recitypm25,cityhtml)[0]
         citypm25 = re.findall('\d+$', citypm25)[0]
         print u'城市名称:         ' + cityname

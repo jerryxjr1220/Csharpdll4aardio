@@ -1,0 +1,88 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Dec 21 12:48:53 2016
+
+@author: xuj06
+"""
+
+import requests as rs
+import re
+mainurl = 'http://www.pm25.com/rank.html'
+header = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',\
+          'Accept-Encoding':'gzip, deflate, sdch',\
+          'Accept-Language':'zh-CN,zh-TW;q=0.8,en;q=0.6',\
+          'Cache-Control':'max-age=0',\
+          'Connection':'keep-alive',\
+          'Host':'www.pm25.com',\
+          'Upgrade-Insecure-Requests':'1',\
+          'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.100 YaBrowser/16.11.0.2680 Yowser/2.5 Safari/537.36'}
+print u'初始化...\n正在导入数据，请稍后...'
+res = rs.get(mainurl,headers=header)
+html = res.text
+
+recity = re.compile(r'<a class="pjadt_location" href="/city/.+?</a>')
+catchcity = re.findall(recity,html)
+citypy = {}
+for each in catchcity:
+    each = each.strip(r'</a>')
+    citypinyin = each[each.find('//')+37:each.find('.')]
+    cityname = eval('u"'+each[each.find('>')+1:]+'"')
+    citypy[citypinyin] = cityname
+
+def PM25(city):
+    global header
+    suburl = 'http://www.pm25.com/city/%s.html' % city
+    ressub = rs.get(suburl, headers=header)
+    return ressub.text
+    
+if __name__=='__main__':
+    print '\n' * 80
+    print u'               欢迎进入PM2.5查询系统！ v0.1'
+    print '=' * 58
+    while True:
+        print '*' * 58
+        while True:
+            print u'请输入你想查询的城市的拼音:(要查询所有城市的拼音，请输入“py”)'
+            citypinyin = raw_input('>>>')
+            if citypinyin == 'py':
+                for eachcity in citypy:
+                    print citypy[eachcity], eachcity
+            elif citypy.get(citypinyin, None):
+                cityname = citypy[citypinyin]
+                break
+            else:
+                print u'你要查询的城市无数据，请重新查询！要查询所有城市的拼音，请输入“py”'
+        print u'正在读取数据，请稍后...'
+        cityhtml = PM25(citypinyin)
+        recityaql = re.compile('(?<=<a class="cbol_aqi_num" href="/news/385.html" target="_blank">)\d+?(?=</a>)')
+        cityaql = re.findall(recityaql,cityhtml)[0]
+        recitycontamination = re.compile('(?<=<a class="cbol_wuranwu_num " href="/news/387.html" target="_blank">).+?(?=</a>)')
+        try:
+            citycontamination = re.findall(recitycontamination,cityhtml)[0]
+        except:
+            citycontamination = u'无首要污染物数据'
+        recitypm25 = re.compile('(?<=<span class="cbol_nongdu_num).+\d+?(?=</span>)')
+        citypm25 = re.findall(recitypm25,cityhtml)[0]
+        citypm25 = re.findall('\d+$', citypm25)[0]
+        print u'城市名称:         ' + cityname
+        print u'空气质量指数:     ' + cityaql
+        try:
+            if 0 < int(cityaql) < 50:
+                print u'空气质量等级:      优'
+            elif 50 <= int(cityaql) < 100:
+                print u'空气质量等级:      良'
+            elif 100 <= int(cityaql) < 150:
+                print u'空气质量等级:      轻度污染'
+            elif 150 <= int(cityaql) < 200:
+                print u'空气质量等级:      中度污染'
+            elif 200 <= int(cityaql) < 300:
+                print u'空气质量等级:      重度污染'
+            elif 300 <= int(cityaql) < 500:
+                print u'空气质量等级:      严重污染'
+            else:
+                print u'空气质量等级:      污染爆表，此地已经不适合人类居住！'
+        except:
+            print u'空气质量等级:      无数据'
+        print u'首要污染物:       ' + citycontamination
+        print u'实时PM2.5:        ' + citypm25
+    

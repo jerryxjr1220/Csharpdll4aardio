@@ -1,0 +1,28 @@
+//调用C# GemBox读写Excel表格
+import dotNet;
+dotNet.reference({
+    "GemBox.Spreadsheet" = $"\res\GemBox.Spreadsheet.dll";
+    "BouncyCastle.Crypto" = $"\res\BouncyCastle.Crypto.dll";
+});
+ 
+Spreadsheet = dotNet.import("GemBox.Spreadsheet");
+ 
+Spreadsheet.SpreadsheetInfo.SetLicense("FREE-LIMITED-KEY");
+ 
+//新建Excel
+wb = Spreadsheet.ExcelFile();
+ 
+//新增worksheet
+ws = wb.Worksheets.Add("Sheet 1");
+ 
+//读取Excel
+//wb = Spreadsheet.ExcelFile.Load(file);
+ 
+//按Cell名称读写值
+ws.Cells.Item["A1"].Value = 123;
+ 
+//按Cell行列读写公式，行列从0开始计数
+ws.Rows.Item[1].Cells.Item[2].Formula = "= A1";
+ 
+//保存
+wb.Save(io.fullpath("\123.xlsx"));

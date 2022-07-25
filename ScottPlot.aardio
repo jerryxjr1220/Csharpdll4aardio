@@ -1,0 +1,59 @@
+//aardio调用c# ScottPlot 控件显示波形图
+import win.ui;
+/*DSG{{*/
+var winform = win.form(text="aardio form";right=759;bottom=469)
+winform.add(
+custom={cls="custom";text="自定义控件";left=0;top=0;right=760;bottom=470;bgcolor=12639424;db=1;dl=1;dr=1;dt=1;z=1}
+)
+/*}}*/
+  
+  
+import dotNet;
+  
+var dll = dotNet.load("\ScottPlot.WinForms.dll");
+var Chart = dll.new("ScottPlot.FormsPlot");
+//绑定界面
+dotNet.setParent(Chart,winform.custom);
+  
+var Plotdll = dotNet.load("\ScottPlot.dll");
+var DataGen = Plotdll.import("ScottPlot.DataGen");
+var plt = Chart.Plot;
+  
+var xs = DataGen.Consecutive(51);
+var sin = DataGen.Sin(51);
+var cos = DataGen.Cos(51);
+  
+// 2条曲线
+plt.AddScatter(xs, sin);
+plt.AddScatter(xs, cos);
+   
+// plot参数设置
+plt.Title("aardio调用c# ScottPlot 控件");
+plt.XLabel("X轴");
+plt.YLabel("Y轴");
+var Crosshair = plt.AddCrosshair(15.0, 0.25);
+Crosshair.VerticalLine.IsVisible = false;
+Crosshair.HorizontalLine.IsVisible = false;
+Chart.Refresh(true);
+  
+Chart.MouseEnter = function(e,r){
+    Crosshair.VerticalLine.IsVisible = true;
+    Crosshair.HorizontalLine.IsVisible = true
+    Chart.Refresh(false,false);
+}
+Chart.MouseLeave = function(e,r){
+    Crosshair.VerticalLine.IsVisible = false;
+    Crosshair.HorizontalLine.IsVisible = false;
+    Chart.Refresh(false,false);
+}
+  
+Chart.MouseMove = function(){
+    var mouseCoordinates = Chart.GetMouseCoordinates(0,0);
+    Crosshair.X = mouseCoordinates.Item1;
+    Crosshair.Y = mouseCoordinates.Item2;
+    Chart.Refresh(false,true);
+}
+ 
+  
+winform.show();
+win.loopMessage();

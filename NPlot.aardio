@@ -37,7 +37,64 @@ yAxis = plot.YAxis1;
 yAxis.Label = "Y Axis";
 xAxis.Label = "X Axis";
   
+ /**
+ //水平线
+lineX = dll.new("HorizontalLine", 3);
+lineX.LengthScale = 1;
+lineX.Pen.Color = System.Drawing.Color.Red;
  
+//垂直线
+lineY = dll.new("VerticalLine", 5);
+lineY.LengthScale = 1;
+lineY.Pen.Color = System.Drawing.Color.Green;
+ 
+ 
+plot.Add(lineX);
+plot.Add(lineY);
+ 
+//水平线和垂直线跟随动态数据更新
+index = 1;
+winform.setInterval( 
+    function(){
+        data[index] = math.random(10, 100);
+        line.OrdinateData= data;
+        lineX.OrdinateValue = data[index];
+        lineY.AbscissaValue = index;
+        plot.Refresh();
+        index ++;
+        if index>100 index=1;
+         
+    },300 
+)
+ **/
+ 
+ /**
+ //图例
+plot.Legend = dll.new("Legend");
+plot.Legend.NumberItemsHorizontally = 2;
+plot.Legend.YOffset = 5;
+plot.Legend.XOffset = 5;
+
+//网格
+NPlot = dll.import("NPlot");
+ 
+grid = dll.new("Grid");
+grid.HorizontalGridType = NPlot.Grid.GridType.None;
+grid.VerticalGridType = NPlot.Grid.GridType.Fine;
+ 
+plot.Add(grid);
+
+//区间着色
+fr = dll.new("FilledRegion", dll.new("VerticalLine", 50), dll.new("VerticalLine", 80));
+plot.Add(fr);
+
+//画箭头
+a = dll.new("ArrowItem", dll.new("PointD", 20, 10), 360, "Arrow");
+a.HeadOffset = 5;
+a.ArrowColor = System.Drawing.Color.Red;
+a.TextColor = System.Drawing.Color.Purple;
+plot.Add(a);
+ **/
   
 index = 1;
 winform.setInterval( 

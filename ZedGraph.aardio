@@ -1,0 +1,38 @@
+//aardio调用C# ZedGraph画图表
+import win.ui;
+/*DSG{{*/
+mainForm = win.form(text="ZedGraph";right=959;bottom=591;composited=1)
+mainForm.add(
+custom={cls="custom";text="自定义控件";left=17;top=40;right=938;bottom=573;z=1}
+)
+/*}}*/
+ 
+import dotNet;
+import System.Drawing;
+import System.Windows.Forms;
+dll = dotNet.loadFile("\res\ZedGraph.dll");
+//创建图表容器
+zedGraphCtrl = dll.new("ZedGraphControl");
+System.Windows.Forms.CreateEmbed(zedGraphCtrl, mainForm.custom);
+ 
+//获取画板
+graphPane = zedGraphCtrl.GraphPane;
+//创建数据
+list = dll.new("PointPairList");
+list.Add(1, 10);
+list.Add(2, 15);
+list.Add(3, 26);
+list.Add(4, 17);
+list.Add(5, 20);
+//添加柱状图
+graphPane.AddBar("Test Bar", list, System.Drawing.Color.Brown);
+ 
+//画到zedGraphControl控件中，此句必加
+zedGraphCtrl.AxisChange();
+zedGraphCtrl.Refresh();
+ 
+mainForm.show();
+ 
+return win.loopMessage();
+ 
+//mainForm需开启双缓冲
